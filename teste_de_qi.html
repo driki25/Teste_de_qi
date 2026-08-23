@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TESTE DE QI | Desafio Mental</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box}
+:root{--red:#ef233c;--orange:#ff8c1a;--yellow:#ffd23f;--green:#25b85a;--purple:#8b4de8;--ink:#17151b;--soft:#f7f7f7}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(135deg,#fff 0%,#fff 48%,#f4efff 100%);color:var(--ink)}
+header{padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #eee;background:#fff;position:sticky;top:0;z-index:5}
+.logo{font-weight:900;letter-spacing:1px}.logo b:nth-child(1){color:var(--red)}.logo b:nth-child(2){color:var(--orange)}.logo b:nth-child(3){color:var(--yellow)}.logo b:nth-child(4){color:var(--green)}.logo b:nth-child(5){color:var(--purple)}
+.page{min-height:calc(100vh - 75px);padding:55px 7%;display:flex;align-items:center;justify-content:center}
+.card{width:min(900px,100%);background:#fff;border:1px solid #e7e2ea;border-radius:26px;padding:clamp(24px,5vw,55px);box-shadow:0 18px 60px rgba(30,15,50,.10)}
+.hero{text-align:center}
+.colorbar{height:8px;border-radius:10px;margin-bottom:30px;background:linear-gradient(90deg,var(--red) 20%,var(--orange) 20% 40%,var(--yellow) 40% 60%,var(--green) 60% 80%,var(--purple) 80%)}
+h1{font-size:clamp(2.5rem,8vw,5.5rem);line-height:.9;margin:0 0 20px;font-weight:900}
+h2{font-size:clamp(1.6rem,4vw,2.4rem)}
+p{color:#67616d;line-height:1.7}
+.btn{border:0;border-radius:14px;padding:16px 25px;font-weight:800;font-size:1rem;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--red),var(--orange));box-shadow:0 10px 25px rgba(239,35,60,.22);transition:.2s}
+.btn:hover{transform:translateY(-2px)}
+.btn.secondary{background:#fff;color:var(--ink);border:2px solid #ddd;box-shadow:none}
+.hidden{display:none!important}
+.note{margin-top:20px;padding:14px;border-radius:12px;background:#faf7ff;border-left:4px solid var(--purple);font-size:.88rem}
+.progress{height:10px;background:#eee;border-radius:99px;overflow:hidden;margin:18px 0 30px}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--purple));width:0;transition:.3s}
+.question-meta{display:flex;justify-content:space-between;color:#777;font-size:.85rem;font-weight:700}
+.question{font-size:1.35rem;font-weight:800;margin:24px 0}
+.options{display:grid;gap:12px}
+.option{width:100%;text-align:left;padding:17px;border:2px solid #e5e1e8;border-radius:13px;background:#fff;cursor:pointer;font-size:1rem;transition:.15s}
+.option:hover{border-color:var(--purple);background:#fbf8ff}
+.option.selected{border-color:var(--purple);background:#f2eaff}
+.actions{display:flex;justify-content:space-between;gap:12px;margin-top:25px}
+.result{text-align:center}
+.score{font-size:5rem;font-weight:900;background:linear-gradient(90deg,var(--red),var(--orange),var(--green),var(--purple));-webkit-background-clip:text;color:transparent}
+.badge{display:inline-block;padding:8px 14px;border-radius:999px;background:#f0e8ff;color:#6c35bb;font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:25px 0}
+.stat{padding:18px;background:#fafafa;border:1px solid #eee;border-radius:15px}.stat strong{display:block;font-size:1.5rem}
+.bar{height:14px;background:#eee;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow),var(--green),var(--purple))}
+@media(max-width:650px){.stats{grid-template-columns:1fr}.actions{flex-direction:column}.score{font-size:4rem}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><b>T</b><b>E</b><b>S</b><b>T</b><b>E</b> DE QI</div>
+  <small>20 DESAFIOS</small>
+</header>
+
+<main class="page">
+<section id="home" class="card hero">
+  <div class="colorbar"></div>
+  <h1>TESTE<br><span style="color:var(--purple)">DE QI</span></h1>
+  <p>Um desafio interativo com 20 perguntas. As 10 primeiras exploram preferências e hábitos pessoais; as 10 últimas avaliam raciocínio, lógica, matemática, linguagem e padrões.</p>
+  <button class="btn" onclick="startTest()">INICIAR TESTE →</button>
+  <div class="note">⚠️ Este é um teste recreativo, não um exame psicológico oficial. As perguntas pessoais não medem QI. O resultado cognitivo é uma estimativa de desempenho neste conjunto de questões.</div>
+</section>
+
+<section id="test" class="card hidden">
+  <div class="question-meta"><span id="part">PARTE 1 • PERFIL</span><span id="counter">1 / 20</span></div>
+  <div class="progress"><span id="progress"></span></div>
+  <div class="question" id="question"></div>
+  <div class="options" id="options"></div>
+  <div class="actions">
+    <button class="btn secondary" onclick="prevQuestion()">← VOLTAR</button>
+    <button class="btn" id="nextBtn" onclick="nextQuestion()">PRÓXIMA →</button>
+  </div>
+</section>
+
+<section id="result" class="card result hidden">
+  <div class="colorbar"></div>
+  <span class="badge">RESULTADO FINAL</span>
+  <h2>Seu desempenho cognitivo</h2>
+  <div class="score" id="score">0%</div>
+  <p id="classification"></p>
+  <div class="stats">
+    <div class="stat"><small>Questões cognitivas</small><strong id="correct">0/10</strong></div>
+    <div class="stat"><small>Percentual</small><strong id="percent">0%</strong></div>
+    <div class="stat"><small>Perfil pessoal</small><strong id="profile">-</strong></div>
+  </div>
+  <div style="text-align:left">
+    <h3>Escala recreativa de desempenho</h3>
+    <div class="bar"><i id="bar"></i></div>
+    <p><b>0–29%</b> em desenvolvimento · <b>30–49%</b> básico · <b>50–69%</b> intermediário · <b>70–89%</b> avançado · <b>90–100%</b> excelente</p>
+  </div>
+  <div class="note" style="text-align:left"><b>Sobre o QI:</b> não é correto transformar diretamente uma porcentagem de acertos em um número de QI. Testes de QI reais usam instrumentos padronizados, normas por idade e aplicação controlada. Aqui, o percentual representa apenas seu desempenho neste desafio.</div>
+  <h3 style="text-align:left;margin-top:30px">Média de referência deste desafio</h3>
+  <p style="text-align:left">Como não existe uma base estatística real dos usuários neste arquivo, a referência é uma escala de desempenho criada para comparação, e não uma “média de QI” científica.</p>
+  <button class="btn" onclick="location.reload()">FAZER NOVAMENTE ↻</button>
+</section>
+</main>
+
+<script>
+const questions=[
+{personal:true,q:"Quando você precisa aprender algo difícil, qual estratégia prefere?",o:["Ver exemplos práticos","Ler uma explicação","Tentar sozinho","Misturar várias estratégias"]},
+{personal:true,q:"Como você costuma resolver um problema inesperado?",o:["Penso com calma","Peço ajuda","Tento várias soluções","Sigo a primeira ideia"]},
+{personal:true,q:"Qual atividade você mais gosta?",o:["Jogos de lógica","Leitura","Criatividade","Esportes"]},
+{personal:true,q:"Quando recebe uma tarefa longa, você costuma...",o:["Dividir em partes","Fazer tudo de uma vez","Adiar","Começar pelo mais fácil"]},
+{personal:true,q:"Você se considera uma pessoa que percebe detalhes?",o:["Muito","Bastante","Às vezes","Pouco"]},
+{personal:true,q:"Quando alguém explica algo novo, você prefere...",o:["Exemplos","Desenhos","Teoria","Praticar"]},
+{personal:true,q:"Como você lida com um erro?",o:["Analiso a causa","Tento de novo","Procuro ajuda","Passo para outra coisa"]},
+{personal:true,q:"Em um trabalho em grupo, você normalmente...",o:["Organiza","Cria ideias","Executa tarefas","Ajuda onde precisa"]},
+{personal:true,q:"Você gosta de desafios que exigem raciocínio?",o:["Muito","Bastante","Um pouco","Não muito"]},
+{personal:true,q:"Quando encontra uma informação nova, você costuma questioná-la?",o:["Sempre","Frequentemente","Às vezes","Raramente"]},
+
+{q:"Qual número completa a sequência? 2, 4, 8, 16, __",o:["20","24","32","36"],a:2},
+{q:"Se todos os gatos são animais e alguns animais são pretos, podemos afirmar que...",o:["Todos os gatos são pretos","Alguns gatos são pretos","Nenhum gato é preto","Não é possível concluir a cor dos gatos"],a:3},
+{q:"Qual palavra não pertence ao grupo?",o:["Maçã","Banana","Cenoura","Laranja"],a:2},
+{q:"3 trabalhadores fazem um serviço em 12 dias. Mantendo o mesmo ritmo, 6 trabalhadores fariam em quantos dias?",o:["2","4","6","8"],a:2},
+{q:"Complete: A, C, F, J, O, __",o:["R","T","U","V"],a:2},
+{q:"Se um livro custa R$ 40 e recebe desconto de 25%, qual será o preço?",o:["R$ 25","R$ 30","R$ 32","R$ 35"],a:1},
+{q:"Um relógio marca 3h. Qual é aproximadamente o ângulo entre os ponteiros?",o:["30°","60°","90°","180°"],a:2},
+{q:"Qual número é o intruso? 9, 16, 25, 36, 45, 49",o:["16","25","36","45"],a:3},
+{q:"Se hoje é terça-feira, que dia será daqui a 17 dias?",o:["Quarta","Quinta","Sexta","Sábado"],a:1},
+{q:"Um cubo tem quantas faces?",o:["4","6","8","12"],a:1}
+];
+let current=0,answers=Array(20).fill(null);
+function startTest(){home.classList.add('hidden');test.classList.remove('hidden');render()}
+function render(){
+ const x=questions[current];
+ part.textContent=x.personal?"PARTE 1 • PERFIL":"PARTE 2 • RACIOCÍNIO";
+ counter.textContent=`${current+1} / 20`;
+ progress.style.width=`${((current+1)/20)*100}%`;
+ question.textContent=x.q; options.innerHTML="";
+ x.o.forEach((text,i)=>{
+   const b=document.createElement("button");b.className="option";b.textContent=text;
+   if(answers[current]===i)b.classList.add("selected");
+   b.onclick=()=>{answers[current]=i;render()};
+   options.appendChild(b);
+ });
+ nextBtn.textContent=current===19?"FINALIZAR TESTE ✓":"PRÓXIMA →";
+}
+function nextQuestion(){
+ if(answers[current]===null){alert("Escolha uma resposta antes de continuar.");return}
+ if(current<19){current++;render()}else finish();
+}
+function prevQuestion(){if(current>0){current--;render()}}
+function finish(){
+ let correct=0;for(let i=10;i<20;i++)if(answers[i]===questions[i].a)correct++;
+ let pct=correct*10;
+ let cls=pct<30?"Em desenvolvimento":pct<50?"Básico":pct<70?"Intermediário":pct<90?"Avançado":"Excelente";
+ let personalScore=answers.slice(0,10).filter(x=>x!==null).length;
+ let profile=personalScore>=8?"Perfil bastante consistente":"Perfil exploratório";
+ test.classList.add('hidden');result.classList.remove('hidden');
+ score.textContent=pct+"%";classification.textContent=`Seu desempenho nas 10 questões cognitivas foi classificado como: ${cls}.`;
+ document.getElementById('correct').textContent=correct+"/10";
+ document.getElementById('percent').textContent=pct+"%";
+ document.getElementById('profile').textContent=profile;
+ document.getElementById('bar').style.width=pct+"%";
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+</body>
+</html>
